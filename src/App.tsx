@@ -56,7 +56,7 @@ export function App() {
         <aside>
           <h3>Adjust</h3>
           {(['brightness', 'contrast', 'saturation'] as const).map(k => <label key={k}>{k}
-            <input type="range" min={k === 'brightness' ? -0.5 : 0} max={k === 'brightness' ? 0.5 : 2} step={0.01} value={s.fx[k]} onChange={e => s.setFx({ [k]: +e.target.value })} /></label>)}
+            <input type="range" min={k === 'brightness' ? -0.5 : 0} max={k === 'brightness' ? 0.5 : 2} step={0.01} value={s.fx[k]} onChange={e => s.setFx({ [k]: +e.target.value } as any)} /></label>)}
           {sel && sel.kind !== 'text' && <>
             <h3>Clip</h3>
             <label>Volume<input type="range" min={0} max={1} step={0.01} value={sel.vol ?? 1} onChange={e => s.updateClip(sel.id, { vol: +e.target.value })} /></label>
