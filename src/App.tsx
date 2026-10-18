@@ -3,6 +3,7 @@ import { useStore } from './store'
 import { Preview } from './Preview'
 import { Timeline } from './Timeline'
 import { isPhone } from './perf'
+import { Home, saveRecent } from './Home'
 const Export = lazy(() => import('./ExportPanel')) // heavy parts load only on first use
 
 function Intro({ done }: { done: () => void }) {
@@ -11,14 +12,19 @@ function Intro({ done }: { done: () => void }) {
 }
 
 export function App() {
-  const [intro, setIntro] = useState(true), [fps, setFps] = useState(0), [showExport, setShowExport] = useState(false)
+  const [view, setView] = useState<'home' | 'editor'>('home'), [intro, setIntro] = useState(true), [fps, setFps] = useState(0), [showExport, setShowExport] = useState(false)
   const s = useStore(), file = useRef<HTMLInputElement>(null)
   const sel = s.clips.find(c => c.id === s.selected)
   const end = Math.max(0, ...s.clips.map(c => c.start + c.dur))
   const importFiles = (fl: FileList | null) => [...(fl ?? [])].forEach(f => {
     const url = URL.createObjectURL(f), v = document.createElement('video') // Blob URL: file is never fully loaded into memory
     v.preload = 'metadata'; v.src = url
-    v.onloadedmetadata = () => useStore.getState().addClip({ id: crypto.randomUUID(), name: f.name, url, start: end, dur: v.duration || 5, trim: 0, track: 0 })
+    v.onloadedmetadata = () => {
+      useStore.getState().addClip({ id: crypto.randomUUID(), name: f.name, url, start: end, dur: v.duration || 5, trim: 0, track: 0 })
+      const rec = { name: f.name, dur: v.duration || 5, ts: Date.now() } as any; saveRecent(rec)
+      v.onseeked = () => { try { const c = document.createElement('canvas'); c.width = 320; c.height = 200; c.getContext('2d')!.drawImage(v, 0, 0, 320, 200); saveRecent({ ...rec, thumb: c.toDataURL('image/jpeg', 0.6) }) } catch {} v.onseeked = null }
+      v.currentTime = Math.min(0.5, (v.duration || 1) / 2)
+    }
   })
   useEffect(() => {
     const k = (e: KeyboardEvent) => {
@@ -34,9 +40,10 @@ export function App() {
   }, [])
   return <>
     {intro && <Intro done={() => setIntro(false)} />}
-    <div className="app">
+    {view === 'home' && !intro && <Home open={now => { setView('editor'); if (now) setTimeout(() => file.current?.click(), 60) }} />}
+    {view === 'editor' && <div className="app">
       <header>
-        <b>Lumora</b>
+        <button onClick={() => setView('home')}>Home</button>
         <button onClick={() => file.current?.click()}>Import</button>
         <button onClick={() => s.setPlaying(!s.playing)}>{s.playing ? 'Pause' : 'Play'}</button>
         <button onClick={s.undo} disabled={!s.past.length}>Undo</button>
@@ -56,7 +63,7 @@ export function App() {
         <aside>
           <h3>Adjust</h3>
           {(['brightness', 'contrast', 'saturation'] as const).map(k => <label key={k}>{k}
-            <input type="range" min={k === 'brightness' ? -0.5 : 0} max={k === 'brightness' ? 0.5 : 2} step={0.01} value={s.fx[k]} onChange={e => s.setFx({ [k]: +e.target.value } as any)} /></label>)}
+            <input type="range" min={k === 'brightness' ? -0.5 : 0} max={k === 'brightness' ? 0.5 : 2} step={0.01} value={s.fx[k]} onChange={e => s.setFx({ [k]: +e.target.value })} /></label>)}
           {sel && sel.kind !== 'text' && <>
             <h3>Clip</h3>
             <label>Volume<input type="range" min={0} max={1} step={0.01} value={sel.vol ?? 1} onChange={e => s.updateClip(sel.id, { vol: +e.target.value })} /></label>
@@ -69,6 +76,6 @@ export function App() {
       {import.meta.env.DEV && <div className="dbg">{fps} FPS · {s.quality}{(performance as any).memory ? ` · ${((performance as any).memory.usedJSHeapSize / 1048576) | 0} MB` : ''}</div>}
       {s.clips.length > 8 && <div className="warn">Large project: use proxy playback{isPhone ? ' and Performance mode' : ''}.</div>}
       {showExport && <Suspense fallback={null}><Export onClose={() => setShowExport(false)} /></Suspense>}
-    </div>
+    </div>}
   </>
 }
