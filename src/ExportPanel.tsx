@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useStore } from './store'
 import { surfaces } from './surfaces'
+import { useSettings } from './settings'
 export default function ExportPanel({ onClose }: { onClose: () => void }) {
   const [msg, setMsg] = useState('Exports a WebM file in real time (plays the project once).'), [pct, setPct] = useState(0), [busy, setBusy] = useState(false)
   const run = async () => {
@@ -8,7 +9,7 @@ export default function ExportPanel({ onClose }: { onClose: () => void }) {
     const end = Math.max(0, ...st.clips.map(c => c.start + c.dur)); if (!g || !tx || !v || !end) return setMsg('Add a clip first.')
     setBusy(true); const q = st.quality, au = st.auto; st.setQuality('full'); useStore.setState({ auto: false })
     const out = document.createElement('canvas'), ctx = out.getContext('2d')!, ms = new MediaStream()
-    out.captureStream(30).getVideoTracks().forEach(t => ms.addTrack(t))
+    out.captureStream(useSettings.getState().fps).getVideoTracks().forEach(t => ms.addTrack(t))
     try { (v as any).captureStream().getAudioTracks().forEach((t: MediaStreamTrack) => ms.addTrack(t)) } catch {}
     const rec = new MediaRecorder(ms, { mimeType: MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm', videoBitsPerSecond: 8_000_000 })
     const chunks: Blob[] = []; rec.ondataavailable = e => e.data.size && chunks.push(e.data)
