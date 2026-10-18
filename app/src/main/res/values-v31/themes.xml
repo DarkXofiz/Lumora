@@ -1,0 +1,11 @@
+<resources>
+    <!-- Android 12+: system splash uses the same background so the hand-off to the animated intro is seamless -->
+    <style name="SplashTheme" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@color/lumoraSplashBg</item>
+        <item name="android:statusBarColor">@color/lumoraSplashBg</item>
+        <item name="android:navigationBarColor">@color/lumoraSplashBg</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowSplashScreenBackground">@color/lumoraSplashBg</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+    </style>
+</resources>

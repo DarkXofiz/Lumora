@@ -1,1 +1,0 @@
-export const surfaces: { gl: HTMLCanvasElement | null; txt: HTMLCanvasElement | null; video: HTMLVideoElement | null; audio: Map<string, HTMLAudioElement> } = { gl: null, txt: null, video: null, audio: new Map() }

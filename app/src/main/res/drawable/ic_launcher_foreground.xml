@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- soft glow -->
+    <path android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="54" android:centerY="54" android:gradientRadius="40">
+                <item android:offset="0.55" android:color="#55FFCF5C"/>
+                <item android:offset="1" android:color="#00FFCF5C"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- orb -->
+    <path android:pathData="M54,54m-23,0a23,23 0,1 1,46 0a23,23 0,1 1,-46 0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="46.5" android:centerY="44" android:gradientRadius="36">
+                <item android:offset="0" android:color="#FFFFF3C4"/>
+                <item android:offset="0.45" android:color="#FFFFCF5C"/>
+                <item android:offset="1" android:color="#FFE0457A"/>
+            </gradient>
+        </aapt:attr>
+    </path>
+    <!-- highlight -->
+    <path android:fillColor="#59FFFFFF" android:pathData="M45,41m-6,0a6,4 0,1 1,12 0a6,4 0,1 1,-12 0"/>
+    <!-- thin ring -->
+    <path android:pathData="M54,54m-31.5,0a31.5,31.5 0,1 1,63 0a31.5,31.5 0,1 1,-63 0"
+        android:strokeColor="#66FFCF5C" android:strokeWidth="0.8" android:fillColor="#00000000"/>
+</vector>
